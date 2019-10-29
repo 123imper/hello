@@ -5,20 +5,204 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+    *{
+        padding: 0;
+        margin: 0;
+    }
+    ul,ol{
+        list-style: none;
+    }
+    .banner{
+        width: 900px;
+        height: 500px;
+        margin: 0 auto;
+        position: relative;
+    }
+    .banner .wrapper{
+        width: 900px;
+        height: 500px;
+        overflow: hidden;
+    }
+    .banner .wrapper ul{
+        width: 9000px;
+        height: 500px;
+        margin-left: 0;
+    }
+    .banner .wrapper ul li{
+        width: 900px;
+        height: 500px;
+        float: left;
+        position: relative;
+        text-align: center;
+        line-height: 500px;
+        font-size: 50px;
+        background-color: #f50;
+    }
+    .banner .pagation {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    }
+    .banner .pagation ol li {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #fff;
+  float: left;
+  margin-left: 10px;
+}
+.banner .pagation ol li.active {
+  background-color: #fff;
+}
+.banner .handle > button {
+  width: 80px;
+  height: 40px;
+  position: absolute;
+  top: 50%;
+  margin-top: -20px;
+}
+.banner .handle .left-btn {
+  left: 5px;
+}
+.banner .handle .right-btn {
+  right: 5px;
+}
+    </style>
 </head>
 <body>
-    <ul>
-        <li>1</li>
-        <li>2</li>
-        <li>3</li>
-        <li>4</li>
-        <li>5</li>
-        <li>6</li>
-        <li>7</li>
-        <li>8</li>
-        <li>9</li>
-        <li>10</li>
-        <li>11</li>
-    </ul>
+    <div class="banner">
+        <div class="wrapper">
+            <ul>
+                <li>1</li>
+                <li>2</li>
+                <li>3</li>
+                <li>4</li>
+                <li>5</li>
+                <li>1</li>
+            </ul>
+        </div>
+        <div class="pagation">
+            <ol>
+                <li class="active"></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ol>
+        </div>
+        <div class="handle">
+            <button class="left-btn">left</button>
+            <button class="right-btn">right</button>
+        </div>
+    </div>
+    <script>
+    function animate(dom , option){
+    clearInterval(dom.timer);
+    dom.timer = setInterval(function(){
+        var isChange = true;
+        for(var k  in option){
+            var currentVal = parseInt(getComputedStyle(dom,null)[k]);
+            var targetVal =  parseInt(option[k]);
+            var speed = (targetVal - currentVal) / 5 ;
+            speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed);
+            if(currentVal != targetVal){
+                isChange = false;
+            }
+            dom.style[k] = currentVal + speed + "px";
+        }
+        
+        if(isChange){
+            clearInterval(dom.timer);
+            return;
+        }
+    }, 30);
+}
+
+    var banner = document.querySelector(".banner")
+    var wrapper = document.querySelector(".wrapper");
+    var ulBox = document.querySelector("ul");
+    var lis = ulBox.querySelectorAll("li")
+
+    var pagation = document.querySelector(".pagation");
+    var points = pagation.querySelectorAll("li") 
+
+    var leftBtn = document.querySelector(".left-btn");
+    var rightBtn = document.querySelector(".right-btn");
+
+    var index = 0;
+    var key = 0;
+    var count = lis.length;
+    var width = 900;
+    var timer = null;
+
+    function setPoints(){
+        for(var i = 0;i<points.length;i++){
+            points[i].classList.remove("active");
+        }
+        points[key].classList.add("active");
+    }
+
+    function autoPlay(){
+        index ++;
+        key ++;
+        if(index > count - 1){
+            index = 1;
+            ulBox.style.marginLeft = "0px"
+        }
+        animate(ulBox,{
+            marginLeft:-index*width
+        })
+        key = key > 4 ?0:key;
+        setPoints()
+    }
+
+    timer = setInterval(autoPlay,2000);
+    banner.addEventListener("mouseenter",function(){
+        clearInterval(timer);
+    })
+    banner.addEventListener("mouseleave",function(){
+        clearInterval(timer);
+        timer = setInterval(autoPlay,2000)
+    })
+    leftBtn.onclick = function(){
+        index --;
+        key --;
+        if(index < 0 ){
+            index = count-2;
+            ulBox.style.marginLeft=-(count-1)*width+"px";
+        }
+        animate(ulBox,{
+            marginLeft:-index*width
+        })
+        key = key < 0 ? 4 : key ;
+        setPoints();
+    }
+
+    rightBtn.onclick = function(){
+        index ++;
+        key ++;
+        if(index > count-1 ){
+            index = 1;
+            ulBox.style.marginLeft= "0px";
+        }
+        animate(ulBox,{
+            marginLeft:-index*width
+        })
+        key = key > 4 ? 0 : key ;
+        setPoints();
+    }
+
+    for(var j = 0;j<points.length;j++){
+        points[j].index = j;
+        points[j].onclick = function(){
+            key = index = this.index;
+            animate(ulBox,{
+                marginLeft:-index*width
+            })
+            setPoints();
+        }
+    }
+
+    </script>
 </body>
 </html>
